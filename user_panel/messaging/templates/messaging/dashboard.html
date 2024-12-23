@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
+    <style>
+      /* General styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(#040404, #050505, #000000);
+        background-size: cover;
+        height: 100vh;
+        color: #333;
+      }
+
+      /* Sidebar styling */
+      aside {
+        background-color: rgba(0, 0, 0, 0.9);
+        width: 250px;
+        height: 100vh;
+        padding: 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        color: #0f0;
+        z-index: 1000;
+      }
+
+      aside .logo {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      aside ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      aside ul li {
+        margin-bottom: 15px;
+      }
+
+      aside ul li a {
+        text-decoration: none;
+        color: #0f0;
+        font-size: 1em;
+        padding: 10px 15px;
+        display: block;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      aside ul li a:hover, aside ul li a.active {
+        background-color: #0f0;
+        color: #333;
+        font-weight: bold;
+      }
+
+      /* Main container */
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        margin-left: 250px; /* Adjust to account for the side nav width */
+        position: relative;
+        box-sizing: border-box; /* Ensure padding & borders are included in width/height calculations */
+      }
+
+      h2, h3 {
+        color: #0f0;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      /* List styling */
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      ul li {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        
+        color: #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      ul li a.btn {
+        margin-left: auto;
+        text-decoration: none;
+        padding: 8px 12px;
+        background-color: blue;
+        color: white;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      ul li a.btn:hover {
+        background-color: rgb(62, 62, 255);
+      }
+
+      /* Form styling */
+      form {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #0f0;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      button.btn {
+        padding: 10px 20px;
+        border: none;
+        background-color: #0f0;
+        color: #333;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button.btn:hover {
+        background-color: #d45b1f;
+      }
+
+      /* Logout button */
+      a.logout {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 15px;
+        color: #0f0;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        text-align: center;
+      }
+
+      a.logout:hover {
+        background-color: #0f0;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        aside {
+          width: 100%; /* Full width on smaller screens */
+          height: auto;
+          position: static;
+          padding: 10px;
+        }
+
+        .container {
+          margin-left: 0; /* No margin for container on small screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside>
+      <div class="logo">
+        User Dashboard
+      </div>
+      <ul>
+        <li><a href="{% url 'user_dashboard' %}" class="active">Home</a></li>
+        <li><a href="{% url 'send_message' %}">Send Message</a></li>
+        <li><a href="{% url 'user_logout' %}" class="logout">Logout</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="container">
+      <h2>User Dashboard</h2>
+
+      <!-- Users Section -->
+      <h3>Recent Chats:</h3>
+      <ul>
+        {% for user in users %}
+          <li>
+            {{ user.username }}
+            <a href="{% url 'send_message_with_user' user.id %}" class="btn">Send Message</a>
+          </li>
+        {% empty %}
+          <li>No users to display. Start a conversation!</li>
+        {% endfor %}
+      </ul>
+      <p>Want to start a message? <a href="{% url 'send_message' %}" class="btn">Send a Message</a></p>
+
+      <!-- Profile Section -->
+      <h3>Your Profile</h3>
+      <form method="POST" action="{% url 'edit_profile' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" value="{{ user.username }}" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" value="{{ user.email }}" required />
+        </div>
+        <div class="form-group">
+          <label for="password">New Password (Leave empty to keep current):</label>
+          <input type="password" id="password" name="password" />
+        </div>
+        <button type="submit" class="btn">Update Profile</button>
+      </form>
+
+      <!-- Logout Button -->
+      <a href="{% url 'user_logout' %}" class="logout">Logout</a>
+
+    </div>
+  </body>
+</html>
