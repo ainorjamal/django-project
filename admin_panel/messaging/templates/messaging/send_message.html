@@ -1,0 +1,251 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Send Message</title>
+    <style>
+      /* General styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(#040404, #050505, #000000);
+        background-size: cover;
+        height: 100vh;
+        color: #333;
+      }
+
+      /* Sidebar styling */
+      aside {
+        background-color: rgba(0, 0, 0, 0.9);
+        width: 250px;
+        height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        color: #0f0;
+        position: absolute;
+        left: -250px; /* Initially hidden */
+        transition: left 0.3s ease-in-out; /* Smooth slide-in effect */
+        z-index: 1000;
+      }
+
+      aside:hover {
+        left: 0; /* Show sidebar on hover */
+      }
+
+      aside .logo {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      aside ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      aside ul li {
+        margin-bottom: 15px;
+      }
+
+      aside ul li a {
+        text-decoration: none;
+        color: #0f0;
+        font-size: 1em;
+        padding: 10px 15px;
+        display: block;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      aside ul li a:hover, aside ul li a.active {
+        background-color: #0f0;
+        color: #333;
+        font-weight: bold;
+      }
+
+      /* Main container */
+      .container {
+        padding: 20px;
+        max-width: 800px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-left: 250px; /* Adjust to account for the side nav width */
+      }
+
+      h2 {
+        color: black;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* Chat Section */
+      .chat-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: auto;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #fff9e6;
+        padding: 15px;
+        overflow-y: auto;
+      }
+
+      .message {
+        margin-bottom: 15px;
+      }
+
+      .message .sender {
+        font-weight: bold;
+        color: blue;
+      }
+
+      .message .content {
+        background-color: #4e4e4e;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 80%;
+        margin-top: 5px;
+      }
+
+      .message.sent .content {
+        background-color: #0f0;
+        color: rgb(90, 90, 90);
+        align-self: flex-end;
+      }
+
+      /* Input and send button */
+      .message-input {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        align-items: flex-start;
+      }
+
+      .message-input textarea {
+        flex-grow: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        resize: none;
+        font-size: 18px;
+      }
+
+      .send-btn {
+        background-color: blue;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.3s ease;
+      }
+
+      .send-btn:hover {
+        background-color: rgb(68, 68, 255);
+      }
+
+      .cancel-btn {
+        background-color: #ccc;
+        color: #333;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: background 0.3s ease;
+      }
+
+      .cancel-btn:hover {
+        background-color: #bbb;
+      }
+
+      /* Error message styling */
+      .text-danger {
+        color: red;
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-image {
+        width: 40px;
+        height: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside>
+      <div class="logo">
+        
+      </div>
+      <ul>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'admin_dashboard' %}" class="active">Dashboard</a></li>
+        <li><a href="{% url 'view_user_messages' user.id %}">Inbox</a></li>
+        <li><a href="{% url 'admin_logout' %}">Logout</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="container">
+      <h2>Send Message</h2>
+
+      <!-- Error Message -->
+      {% if error %}
+      <p class="text-danger">{{ error }}</p>
+      {% endif %}
+
+      <!-- Chat Container -->
+      <div class="chat-container">
+        {% if receiver %}
+        <p><strong>Receiver:</strong> {{ receiver.username }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Message Input -->
+      <form method="post">
+        {% csrf_token %}
+        <div class="message-input">
+          {% if not receiver %}
+          <input
+            type="text"
+            name="receiver"
+            id="receiver"
+            placeholder="Receiver Username"
+            required
+            style="
+              flex-grow: 1;
+              padding: 10px;
+              border-radius: 10px;
+              border: 1px solid #ddd;
+            "
+          />
+          {% endif %}
+          <textarea
+            name="content"
+            id="content"
+            rows="3"
+            placeholder="Type your message..."
+            required
+          ></textarea>
+          <button type="submit" class="send-btn">Send</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
