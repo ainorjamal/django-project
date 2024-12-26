@@ -12,15 +12,6 @@ User = get_user_model()  # Use the custom user model
 def home(request):
     return render(request, 'messaging/home.html') 
 
-def edit_profile(request):
-    if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('user_dashboard')  # Redirect to the user dashboard after update
-    else:
-        form = UserChangeForm(instance=request.user)
-    return render(request, 'user_dashboard.html', {'form': form})
 
 # User Registration View
 def user_register(request):

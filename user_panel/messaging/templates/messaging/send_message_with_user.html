@@ -1,27 +1,134 @@
+<style>
+  /* Message Section Styles */
+/* Message Section Styles */
+body {
+  background-color: #000; /* Set background color to black */
+  color: #0f0; /* Set text color to green */
+  font-family: Arial, sans-serif;
+}
+
+h2, h3 {
+  color: #0f0;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.messages-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.messages-list .message-item {
+  background-color: #575656;
+  border-left: 6px solid blue;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.messages-list .message-item:hover {
+  transform: translateX(5px);
+  background-color: #ffffff;
+  color: black;
+  border-left: 6px solid #0f0;
+}
+
+.messages-list .no-messages {
+  color: #888;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.message-form .form-group {
+  margin-bottom: 15px;
+}
+
+.message-form .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #0f0;
+}
+
+.message-form .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.message-form .btn-send {
+  padding: 10px 20px;
+  border: none;
+  background-color: #0f0;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px; /* Add margin for spacing */
+}
+
+.message-form .btn-send:hover {
+  background-color: #d45b1f;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 15px;
+  color: #0f0;
+  background-color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.btn-back:hover {
+  background-color: #0f0;
+  color: black;
+}
+
+/* Ensure the buttons are aligned */
+.form-group {
+  display: flex;
+  justify-content: space-between; /* Center buttons */
+  gap: 15px; /* Space between the buttons */
+}
+
+</style>
+
 <h2>Send a Message to {{ receiver.username }}</h2>
 
 <!-- Display Previous Messages -->
 <h3>Conversation</h3>
-<ul>
+<ul class="messages-list">
   {% for msg in messages %}
-    <li>
+    <li class="message-item">
       <strong>{{ msg.sender.username }}:</strong> {{ msg.content }} <br>
       <small>{{ msg.timestamp }}</small>
     </li>
   {% empty %}
-    <li>No messages yet. Start the conversation!</li>
+    <li class="no-messages">No messages yet. Start the conversation!</li>
   {% endfor %}
 </ul>
 
 <!-- Send New Message -->
-<form method="POST">
+<form method="POST" class="message-form">
   {% csrf_token %}
   <div class="form-group">
     <label for="content">New Message:</label>
     <textarea class="form-control" id="content" name="content" required></textarea>
   </div>
-  <button type="submit" class="btn btn-primary">Send Message</button>
+  <div class="form-group">
+    <a href="{% url 'user_dashboard' %}" class="btn-back">Back to Dashboard</a>
+    <button type="submit" class="btn-send">Send Message</button>
+    
+  </div>
 </form>
 
-<!-- Button to Return to Dashboard -->
-<a href="{% url 'user_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>

@@ -1,10 +1,94 @@
+<style>
+  /* Message Section Styles */
+body {
+  background-color: #000; /* Set background color to black */
+  color: #0f0; /* Set text color to green */
+  font-family: Arial, sans-serif;
+}
+
+h2, h3 {
+  color: #0f0;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.alert {
+  background-color: #f44336; /* Red alert background */
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #0f0;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.message-form .btn-send {
+  padding: 10px 20px;
+  border: none;
+  background-color: #0f0;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+  display: inline-block;
+}
+
+.message-form .btn-send:hover {
+  background-color: #d45b1f;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 15px;
+  color: #0f0;
+  background-color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.btn-back:hover {
+  background-color: #0f0;
+  color: black;
+}
+
+/* Ensure the buttons are aligned */
+.form-group {
+  display: flex;
+  justify-content: space-between; /* Center buttons */
+  gap: 15px; /* Space between the buttons */
+}
+
+
+</style>
 <h2>Send a Message</h2>
 
 {% if error %}
-  <div class="alert alert-danger">{{ error }}</div>
+  <div class="alert">{{ error }}</div>
 {% endif %}
 
-<form method="POST">
+<form method="POST" class="message-form">
   {% csrf_token %}
   <div class="form-group">
     <label for="receiver">Username:</label>
@@ -14,5 +98,9 @@
     <label for="content">Message:</label>
     <textarea class="form-control" id="content" name="content" required></textarea>
   </div>
-  <button type="submit" class="btn btn-primary">Send Message</button>
+  <div class="form-group">
+    <a href="{% url 'user_dashboard' %}" class="btn-back">Back to Dashboard</a>
+    <button type="submit" class="btn-send">Send Message</button>
+
+  </div>
 </form>
