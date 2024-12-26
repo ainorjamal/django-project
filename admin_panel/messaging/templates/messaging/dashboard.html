@@ -236,7 +236,7 @@ aside:hover {
     <!-- Sidebar -->
     <aside>
       <div class="logo">
-       
+        Talksy
       </div>
       <ul>
         <li><a href="{% url 'home' %}">Home</a></li>
@@ -279,12 +279,14 @@ aside:hover {
       <p>No users available.</p>
       {% endif %}
 
-      <h2 class="section-title">System Logs</h2>
+      <h2 class="section-title">Message Logs</h2>
       {% if messages %}
       <ul class="messages">
         {% for message in messages %}
         <li class="message">
-          <p>{{ message }}</p>
+          <p>From: {{ message.sender }}</p>
+          <p>Message: {{message.content }}</p>
+          <p>To: {{ message.receiver}}</p>
         </li>
         {% endfor %}
       </ul>

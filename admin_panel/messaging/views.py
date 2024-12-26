@@ -16,28 +16,29 @@ from django.contrib.auth import get_user_model
 
 
 User = get_user_model()  # Use the custom user model
+from django.db.models import Max
 
 def view_user_messages(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    messages = Message.objects.filter(receiver=user)
+
+    # Retrieve the latest message from each sender to the user
+    latest_messages = Message.objects.filter(receiver=user).annotate(
+        latest_timestamp=Max('timestamp')
+    ).order_by('-latest_timestamp')
 
     # Decrypt the message content before displaying it
-    for message in messages:
+    for message in latest_messages:
         message.content = message.get_decrypted_content()
 
-    return render(request, 'messaging/view_user_messages.html', {'user': user, 'messages': messages})
+    # Get distinct senders by using only the latest message for each sender
+    distinct_messages = {}
+    for message in latest_messages:
+        if message.sender not in distinct_messages:
+            distinct_messages[message.sender] = message
 
+    return render(request, 'messaging/view_user_messages.html', {'user': user, 'messages': distinct_messages.values(), 'current_user': request.user})
 def home(request):
     return render(request, 'messaging/home.html') 
-
-def edit_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    if request.method == 'POST':
-        user.username = request.POST.get('username')
-        user.email = request.POST.get('email')
-        user.save()
-        return redirect('admin_dashboard')
-    return render(request, 'admin_panel/edit_user.html', {'user': user})
 
 
 def delete_user(request, user_id):
@@ -80,23 +81,46 @@ def admin_logout(request):
 # Send Message View
 @login_required
 def send_message(request, user_id=None):
+    # If user_id is provided, handle conversation and message sending
+    if user_id:
+        try:
+            receiver = User.objects.get(id=user_id)
+            messages = (
+                Message.objects.filter(sender=request.user, receiver=receiver) |
+                Message.objects.filter(sender=receiver, receiver=request.user)
+            ).order_by('timestamp')  # Sort messages by most recent first
+
+            # Decrypt message content before displaying
+            for message in messages:
+                message.content = message.get_decrypted_content()
+
+        except User.DoesNotExist:
+            return redirect('admin_dashboard')  # Redirect if the user doesn't exist
+
+        # Handle POST request for sending a message
+        if request.method == 'POST':
+            content = request.POST.get('content')
+            if content:
+                message = Message(sender=request.user, receiver=receiver, content=content)
+                message.save()
+                return redirect('send_message', user_id=user_id)  # Reload conversation
+
+        return render(request, 'messaging/send_message.html', {'receiver': receiver, 'messages': messages})
+
+    # If no user_id is provided, handle sending a message to any user
     if request.method == 'POST':
         content = request.POST.get('content')
-
+        receiver_username = request.POST.get('receiver')
         try:
-            receiver = get_object_or_404(User, id=user_id)
+            receiver = User.objects.get(username=receiver_username)
+            if content:
+                message = Message(sender=request.user, receiver=receiver, content=content)
+                message.save()
+                return redirect('admin_dashboard')  # Redirect after sending the message
         except User.DoesNotExist:
             return render(request, 'messaging/send_message.html', {'error': 'User not found'})
 
-        # Create and save the message (content encrypted automatically by middleware)
-        message = Message(sender=request.user, receiver=receiver, content=content)
-        message.save()
-
-        return redirect('admin_dashboard')  # Redirect after sending the message
-
-    # Preload the receiver's info if user_id is provided
-    receiver = get_object_or_404(User, id=user_id) if user_id else None
-    return render(request, 'messaging/send_message.html', {'receiver': receiver})
+    return render(request, 'messaging/send_message.html')
 
 # Message List View
 def message_list(request):

@@ -191,7 +191,7 @@
     <!-- Sidebar -->
     <aside>
       <div class="logo">
-        
+        Talksy
       </div>
       <ul>
         <li><a href="{% url 'home' %}">Home</a></li>
@@ -214,6 +214,19 @@
       <div class="chat-container">
         {% if receiver %}
         <p><strong>Receiver:</strong> {{ receiver.username }}</p>
+        {% endif %}
+
+        {% if messages %}
+        <ul>
+          {% for message in messages %}
+          <li class="message {% if message.sender == request.user %}sent{% endif %}">
+            <strong class="sender">{{ message.sender.username }}:</strong>
+            <div class="content">{{ message.content }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p>No messages found.</p>
         {% endif %}
       </div>
 

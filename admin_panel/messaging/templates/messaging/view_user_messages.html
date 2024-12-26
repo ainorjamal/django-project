@@ -99,7 +99,7 @@
       }
 
       strong {
-        color: #e26a2c;
+        color: #3a00f9;
       }
 
       /* Reply button styling */
@@ -166,6 +166,9 @@
   <body>
     <!-- Sidebar -->
     <aside>
+      <div class="logo">
+        Talksy
+      </div>
       <ul>
         <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
@@ -176,7 +179,7 @@
 
     <!-- Main Content -->
     <div class="container">
-      <h2>Feedbacks</h2>
+      <h2>Your messages</h2>
 
       {% if messages %}
       <ul>
@@ -184,7 +187,6 @@
         <li>
           <h4>
             <strong>Sender:</strong> {{ message.sender.username }} <br />
-            <strong>Receiver:</strong> {{ message.receiver.username }} <br />
             <strong>Message:</strong> {{ message.content }}
             <a 
               href="{% url 'send_message' message.sender.id %}" 
