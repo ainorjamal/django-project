@@ -83,7 +83,7 @@ def send_message(request, user_id=None):
         try:
             receiver = User.objects.get(id=user_id)
             messages = Message.objects.filter(sender=request.user, receiver=receiver) | Message.objects.filter(sender=receiver, receiver=request.user)
-            messages = messages.order_by('-timestamp')  # Sort by most recent first
+            messages = messages.order_by('timestamp')  # Sort by most recent first
 
             # Decrypt the message content before displaying it
             for message in messages:

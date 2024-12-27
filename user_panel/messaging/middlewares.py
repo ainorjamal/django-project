@@ -28,7 +28,7 @@ class EncryptionMiddleware(MiddlewareMixin):
         """Decrypt message content in the request body."""
         if request.method in ['POST', 'PUT', 'PATCH'] and request.body:
             try:
-                # Assuming the content is JSON encoded
+                
                 decrypted_data = cipher_suite.decrypt(request.body).decode('utf-8')
                 request._body = decrypted_data  # Modify the request body with decrypted data
             except Exception as e:
